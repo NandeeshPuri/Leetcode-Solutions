@@ -1,19 +1,24 @@
 class Solution {
 public:
-    int numMusicPlaylists(int n, int goal, int k) {
-        const int MOD = 1e9 + 7;
-        vector<vector<long long>> dp(2, vector<long long>(n+1, 0));
-        dp[0][0] = 1;
-
-        for (int i = 1; i <= goal; i++) {
-            dp[i%2][0] = 0;
-            for (int j = 1; j <= min(i, n); j++) {
-                dp[i%2][j] = dp[(i - 1)%2][j - 1] * (n - (j - 1)) % MOD;
-                if (j > k)
-                    dp[i%2][j] = (dp[i%2][j] + dp[(i - 1)%2][j] * (j - k)) % MOD;
-            }
+   int nn;
+   long long mod = 1e9+7;
+   long long dp[101][101];
+   long long help(int num,int g,int k){
+        if(g==0){
+            if(num==nn)return 1;
+            else return 0;
         }
-
-        return dp[goal%2][n];
+        if(dp[num][g]!=-1)return dp[num][g];
+        long long ans=0;
+        ans = (ans + ((nn-num)*help(num+1,g-1,k))%mod)%mod;
+        if(num>=k){
+            ans = (ans + ((num-k)*help(num,g-1,k))%mod)%mod;
+        }
+        return dp[num][g] = ans%mod;
+    }
+    int numMusicPlaylists(int n, int g, int k) {
+        nn=n;
+        memset(dp,-1,sizeof(dp));
+        return help(0,g,k);
     }
 };
