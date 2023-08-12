@@ -1,11 +1,11 @@
 class Solution {
 public:
-    int accountBalanceAfterPurchase(int pa) {
-        int x=pa%10;
-        int y=10-x,c=0;
-        if(x<y) c=pa-x;
-        else c=pa+y;
-
-        return (100-c);
+    int accountBalanceAfterPurchase(int k) {
+        if(k%10 >= 5){
+            k += (10-k%10);
+        }else{
+            k -= k%10;
+        }
+        return 100-k;
     }
 };
