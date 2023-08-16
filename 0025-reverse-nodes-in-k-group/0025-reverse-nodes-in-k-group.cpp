@@ -10,34 +10,48 @@
  */
 class Solution {
 public:
-    int length(ListNode *head){
-        int size=0;
-        ListNode *ptr=head;
-        while(ptr){
-            ptr=ptr->next;
-            size++;
-        }
-        return size;
-    }
-    ListNode* solve(ListNode* head,int &k,int size){
-        if(size<k)return head;
+     pair<ListNode*, ListNode*> reverseList(ListNode* head) {
+   ListNode* prev=NULL;
+   ListNode* newtail = head;
+   while(head){
+     ListNode* curr = head;
+     head= head->next;
+     curr->next = prev;
+     prev= curr;
+   }
+   return make_pair(prev, newtail );
+ }
 
-        if(head==NULL)return NULL;
 
-        ListNode *curr=head,*next=NULL,*prev=NULL;
-        int cnt=0;
-        while(curr!=NULL && cnt<k){
-            next=curr->next;
-            curr->next=prev;
-            prev=curr;
-            curr=next;
-            cnt++;
-        }
-        head->next=solve(next,k,size-k);
-        return prev;
-    }
-    ListNode* reverseKGroup(ListNode* head, int k) {
-        int n=length(head);
-        return solve(head,k,n);
-    }
+ ListNode* reverseKGroup(ListNode* head, int k) {
+   if(head==NULL || head->next==NULL) return head;
+   ListNode* newHead = NULL;
+   ListNode* curr = head;
+   ListNode* tail =head;
+   ListNode* prev = NULL;
+   int i = 1;
+   while(tail!=NULL && tail->next!=NULL && i<k){
+     tail=tail->next;
+     i++;
+
+     if(i==k){
+       ListNode* next = tail->next;
+       tail->next =NULL;
+       pair<ListNode*, ListNode*> rl =  reverseList(curr);
+       if(newHead==NULL){
+         newHead = rl.first;
+       }else{
+         prev->next = rl.first;
+       }
+      
+       prev = rl.second;
+       rl.second->next = next;
+       tail= next;
+       curr=next;
+       i=1;
+     }
+   }
+   if(newHead) return newHead;
+   return head;
+ }
 };
