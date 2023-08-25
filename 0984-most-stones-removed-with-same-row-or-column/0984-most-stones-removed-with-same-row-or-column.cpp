@@ -1,31 +1,27 @@
 class Solution {
 public:
-    bool isValid(vector<int>&pos1, vector<int>&pos2)
-    {
-        if (pos1[0] == pos2[0]) return true;
-        if (pos1[1] == pos2[1]) return true;
-        return false;
-    }
-    void dfs(vector<vector<int>>&stones, vector<bool>&visited, int currIdx)
-    {
-        visited[currIdx] = true;
-        for (int i = 0; i < stones.size(); i++)
-        {
-            if (visited[i]) continue;
-            if (isValid(stones[i], stones[currIdx]))  dfs(stones, visited, i);
+    int n;
+    vector<int> vis;
+    //Same as no of ISalands and can be aslo done with union find algorithm (DSU)
+    void dfs(int idx,vector<vector<int>> &stones){
+        vis[idx] = true;
+        for(int i=0;i<n;i++){
+            if(vis[i]) continue;
+            if(stones[idx][0] == stones[i][0] || stones[idx][1] == stones[i][1]){
+                dfs(i,stones);
+            }
         }
+        return;
     }
-    int removeStones(vector<vector<int>>& stones)
-    {
-        int n = stones.size();
-        vector<bool>visited(n, false);
-        int componentCount = 0;
-        for (int i = 0; i < n; i++)
-        {
-            if (visited[i]) continue;
-            dfs(stones, visited, i);
-            componentCount++;
+    int removeStones(vector<vector<int>>& stones) {
+        n = stones.size();
+        vis.resize(n,0);
+        int val = 0;
+        for(int i=0;i<n;i++){
+            if(vis[i]) continue;
+            val++;
+            dfs(i,stones);
         }
-        return (n - componentCount); 
+        return n - val;
     }
 };
