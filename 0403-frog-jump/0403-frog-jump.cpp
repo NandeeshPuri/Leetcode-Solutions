@@ -1,28 +1,41 @@
 class Solution {
 public:
+    unordered_map<int, int> mark;
+    int dp[2001][2001];
+
     bool canCross(vector<int>& stones) {
         int n = stones.size();
-        unordered_set<int> stoneSet(stones.begin(), stones.end());
-
-        vector<vector<bool>> dp(n, vector<bool>(n + 1, false)); // create dp array
+        // Mark stones in the map to identify if such stone exists or not.
+        for (int i = 0 ; i < n; i++) {
+            mark[stones[i]] = i;
+        }
         
-
-        dp[0][0] = true;// base case: when frog  start from first stone or we change say if stones.size==1 then it mean start and end index is same
-        
-        for (int i = 1; i < n; ++i) {
-            for (int j = i - 1; j >= 0; --j) {
-                int jump = stones[i] - stones[j];
-    
-                if (jump <= j + 1) { // check the jump is possible 
-                    dp[i][jump] = dp[j][jump - 1] || dp[j][jump] || dp[j][jump + 1]; 
-                    // 3 possiblilty 1) jump - 1 2) jump   3) jump + 1
-                    if (i == n - 1 && dp[i][jump]) {  //reach last index 
-                        return true;
+        dp[0][0] = 1;
+        for (int index = 0; index < n; index++) {
+            for (int prevJump = 0; prevJump <= n; prevJump++) {
+                // If stone exists, mark the value with position and jump as 1.
+                if (dp[index][prevJump]) {
+                    if (mark[stones[index] + prevJump]) {
+                        dp[mark[stones[index] + prevJump]][prevJump] = 1;
+                    }
+                    if (mark[stones[index] + prevJump + 1]) {
+                        dp[mark[stones[index] + prevJump + 1]][prevJump + 1] = 1;
+                    }
+                    if (mark[stones[index] + prevJump - 1]) {
+                        dp[mark[stones[index] + prevJump - 1]][prevJump - 1] = 1;
                     }
                 }
+                
+                
             }
         }
         
+        // If any value with index as n - 1 is true, return true.
+        for (int prevJump = 0; prevJump <= n; prevJump++) {
+            if (dp[n - 1][prevJump]) {
+                return true;
+            }
+        }
         return false;
     }
 };
