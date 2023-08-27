@@ -1,27 +1,28 @@
 class Solution {
 public:
-    bool help(int i,int k,vector<int>&s,vector<vector<int>>&dp){
-        if(i==s.size()-1){
-            return true;
+    bool canCross(vector<int>& stones) {
+        int n = stones.size();
+        unordered_set<int> stoneSet(stones.begin(), stones.end());
+
+        vector<vector<bool>> dp(n, vector<bool>(n + 1, false)); // create dp array
+        
+
+        dp[0][0] = true;// base case: when frog  start from first stone or we change say if stones.size==1 then it mean start and end index is same
+        
+        for (int i = 1; i < n; ++i) {
+            for (int j = i - 1; j >= 0; --j) {
+                int jump = stones[i] - stones[j];
+    
+                if (jump <= j + 1) { // check the jump is possible 
+                    dp[i][jump] = dp[j][jump - 1] || dp[j][jump] || dp[j][jump + 1]; 
+                    // 3 possiblilty 1) jump - 1 2) jump   3) jump + 1
+                    if (i == n - 1 && dp[i][jump]) {  //reach last index 
+                        return true;
+                    }
+                }
+            }
         }
-        bool a=false;
-        if(dp[i][k]!=-1)return dp[i][k];
-        for(int j=i+1;j<s.size();j++){
-            if(s[j]>(s[i]+k+1))break;
-            else if(s[j]==(s[i]+k-1)){
-                a |= help(j,k-1,s,dp);
-            }
-            else if(s[j]==(s[i]+k)){
-                 a |= help(j,k,s,dp);
-            }
-            else if(s[j]==(s[i]+k+1)){
-                a |= help(j,k+1,s,dp);
-            }
-        }
-        return dp[i][k]= a;
-    }
-    bool canCross(vector<int>& s) {
-        vector<vector<int>>dp(s.size()+2,vector<int>(4000,-1));
-        return help(0,0,s,dp);
+        
+        return false;
     }
 };
