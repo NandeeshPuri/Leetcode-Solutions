@@ -1,21 +1,60 @@
+bool mycomp(string a,string b){
+    return a < b;
+}
+
 class Solution {
 public:
-    int ans = 0;
+    
+    int find_digs(int a){
+        int ans = 0;
+        while(a>0){
+            a/=10;
+            ans++;
+        }
+        return ans;
+    }
+    
+    int helper(vector<string>& digits,string num){
+        int ans = 0;
+        int i = 0;
+       
+        if(num.length() == 0)
+            return 1;
+        
+        while(i<digits.size() && stoi(digits[i]) < (num[0]-'0')){      
+			ans += pow(digits.size(),num.length()-1);    /// Adding numbers that start with lesser most significant digit
+            i++;
+        }
+        if(i<digits.size() && stoi(digits[i]) == (num[0]-'0')){
+            ans += helper(digits,num.substr(1));   /// calling recursion to find result of numbers that start with the same most significant digit.
+        }
+        
+        return ans;
+        
+    }
+    
+    
     int atMostNGivenDigitSet(vector<string>& digits, int n) {
-        string num = to_string(n);
-        int ans = 0, max_digits = num.size(), m = digits.size();
+        sort(digits.begin(),digits.end(),mycomp);   /// Sorting the digits array
         
-        for(int i = 1; i < max_digits; i++) {
-            ans += pow(m, i);
+        int ans = 0;
+        
+        int d = find_digs(n);    /// number of digits in the number n
+        
+        for(int i = 1;i<=d-1;i++){
+            ans += pow(digits.size(),i);    /// Addding the number of numbers which have less than d digits
         }
         
-        for(int i = 0; i < max_digits; i++) {
-            // binary search element
-            int j = lower_bound(begin(digits), end(digits), num[i], [](auto d, auto v){return d[0] < v;}) - begin(digits);
-            ans += pow(m, max_digits - 1 - i) * j;
-            if(j >= m || digits[j][0] != num[i]) return ans;
+        string num="";
+        while(n>0){
+            num += to_string(n%10);
+            n/=10;
         }
+        reverse(num.begin(),num.end());   /// converting n to string
         
-        return ans + 1;
+       ans += helper(digits,num);    /// helper function finds count of numbers strictly less than num
+        
+        return ans;
+ 
     }
 };
