@@ -1,29 +1,66 @@
-int dp[101][10] = {}, m = 1000000007;
+typedef long long   ll;
+ll mod = 1000000007;
+
 class Solution {
 public:
-int dfs(int i, int p, const string &n, bool lim) {
-    if (p < 0 || p > 9 || (lim && p > (n[n.size() - i] - '0')))
-        return 0;
-    if (i == 1)
-        return 1;    
-    lim &= p == (n[n.size() - i] - '0');
-    if (lim)
-        return (dfs(i - 1, p - 1, n, lim) + dfs(i - 1, p + 1, n, lim)) % m;
-    if (dp[i][p] == 0)
-        dp[i][p] = (1 + dfs(i - 1, p - 1, n, lim) + dfs(i - 1, p + 1, n, lim)) % m;
-    return dp[i][p] - 1;
-}
-int count(const string &n) {
-    int res = 0;
-    for (int sz = 1; sz <= n.size(); ++sz)
-        for (int d = 1; d <= 9; ++d)
-            res = (res + dfs(sz, d, n, sz == n.size())) % m;   
-    return res;
-}
-int countSteppingNumbers(const string &low, const string &high) {
-    return (m + count(high) - count(low) + 
-        equal(begin(low) + 1, end(low), begin(low), [](int a, int b){
-            return abs(a - b) == 1;
-        })) % m;
-}
+    ll dp[101][2][2][11];
+
+    ll helper(ll pos, ll tight, ll isZero, ll prevDigit, string &s) {
+        if (pos == (ll) s.size()) {
+            if (isZero) return 0;
+            return 1;
+        }
+
+        if (dp[pos][tight][isZero][prevDigit + 1] != -1) return dp[pos][tight][isZero][prevDigit + 1];
+
+        ll res = 0;
+        ll limit;
+
+        if (tight) limit = (s[pos] - '0');
+        else limit = 9;
+
+        for (ll curDigit = 0; curDigit <= limit; curDigit++) {
+
+            ll newTight = tight;
+            if (tight && curDigit < limit) newTight = 0;
+
+            ll willBeZero = isZero;
+            if (isZero && curDigit > 0) willBeZero = 0;
+
+            if (isZero) {
+                res += helper(pos + 1, newTight, willBeZero, curDigit, s);
+                res %= mod;
+            } else {
+                if (abs(curDigit - prevDigit) == 1) {
+                    res += helper(pos + 1, newTight, willBeZero, curDigit, s);
+                    res %= mod;
+                }
+            }
+        }
+
+        dp[pos][tight][isZero][prevDigit + 1] = res;
+        return res;
+    }
+    
+    int countSteppingNumbers(string low, string high) {
+        
+        memset(dp, -1, sizeof(dp));
+        ll l = helper(0, 1, 1, -1, low);
+        
+        memset(dp, -1, sizeof(dp));
+        ll r = helper(0, 1, 1, -1, high);
+        
+        ll res = r - l;
+        res %= mod;
+        res += mod;
+        res %= mod;
+        
+        ll add = true;
+        for (ll i = 1; i < (ll) low.size(); i++)
+            if (abs(low[i] - low[i - 1]) != 1) add = false;
+        if (add) res++;
+        
+        res %= mod;
+        return res;
+    }
 };
