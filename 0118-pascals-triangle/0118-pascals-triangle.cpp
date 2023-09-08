@@ -1,25 +1,25 @@
 class Solution {
 public:
-int dp[31][31];
-int nCr(int n, int r) {
-    // Base cases
-    if (r == 0 || r == n) 
-        return 1;
-    if(dp[n][r]!=-1)
-    return dp[n][r];
-        // Recursively calculate nCr using the formula
-    return dp[n][r]=nCr(n - 1, r - 1) + nCr(n - 1, r);
-}
-    vector<vector<int>> generate(int numRows) {
-        memset(dp,-1,sizeof(dp));
-        vector<vector<int>>v;
-        for(int n=0;n<numRows;n++){
-            vector<int>v1;
-         for(int r=0;r<=n;r++){
-           v1.push_back(nCr(n,r));
-         }
-         v.push_back(v1);
+    vector<vector<int>> generate(int numRows)
+    {
+        int n=numRows;
+        vector<vector<int>> ans;
+        ans.push_back({1});
+        if(n==1)
+            return ans; 
+        ans.push_back({1,1});
+        if(n==2)
+            return ans;
+        for(int i=2;i<n;i++)
+        {
+            vector<int> temp(i+1,1);
+            for(int j=1;j<i;j++)
+            {
+                temp[j]=ans[i-1][j-1]+ans[i-1][j];
+            }
+            ans.push_back(temp);
         }
-        return v;
+        
+        return ans;
     }
 };
