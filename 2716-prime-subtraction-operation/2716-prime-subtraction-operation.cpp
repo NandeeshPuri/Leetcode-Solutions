@@ -1,44 +1,55 @@
 class Solution {
 public:
+    bool check(int n)
+    {
+        if (n <= 1)
+		return false;
+     	if (n == 2 || n == 3)
+	     	return true;
+	    if (n % 2 == 0 || n % 3 == 0)
+		  return false;
+	    for (int i = 5; i <= sqrt(n); i = i + 6)
+		   if (n % i == 0 || n % (i + 2) == 0)
+			return false;
+	    return true;
+    }
     bool primeSubOperation(vector<int>& nums) {
-        vector<int> primes = sieveOfEratosthenes(1000);
-        for (int i = nums.size(); i >= 2; i--) {
-            if (nums[i - 2] >= nums[i - 1]) {
-                int index = -1;
-                for (int primeIndex = 0; primeIndex < primes.size(); primeIndex++) {
-                    if (primes[primeIndex] >= nums[i - 2]) {
-                        break;
-                    }
-
-                    if (nums[i - 2] - primes[primeIndex] < nums[i - 1]) {
-                        index = primeIndex;
-                        break;
-                    }
+        bool fl=true;
+        int n=nums.size();
+        if(n==1) return true;
+        for(int i=1;i<n;i++)
+        {
+            if(nums[i-1]>=nums[i])
+            {
+                fl=false;
+            }
+        }
+        if(fl)
+        { 
+            // when array is already in strictly increasing order.
+            return true;
+        }
+        for(int i=nums[0]-1;i>1;i--)
+        {
+            if(check(i))
+            {
+                nums[0]-=i;
+                break;
+            }
+        }
+        for(int i=1;i<n;i++)
+        {
+            int k=nums[i]-nums[i-1];
+            if(k<=0) return false;
+            for(int j=k-1;j>1;j--)
+            {
+                if(check(j))
+                {
+                    nums[i]-=j;
+                    break;
                 }
-                if (index == -1) {
-                    return false;
-                }
-                nums[i - 2] = nums[i - 2] - primes[index];
             }
         }
         return true;
-    }
-
-    vector<int> sieveOfEratosthenes(int count) {
-        vector<int> result;
-        vector<bool> primes(count + 1, true);
-        for (int i = 2; i * i <= count; i++) {
-            if (primes[i]) {
-                for (int j = i * 2; j <= count; j += i) {
-                    primes[j] = false;
-                }
-            }
-        }
-        for (int i = 2; i <= count; i++) {
-            if (primes[i]) {
-                result.push_back(i);
-            }
-        }
-        return result;
     }
 };
