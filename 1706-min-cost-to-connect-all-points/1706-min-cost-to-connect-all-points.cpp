@@ -1,54 +1,33 @@
 class Solution {
 public:
+    using Cost_Index = pair<int,int>; using Point = vector<int>;
+    inline int d(const Point &p1, const Point &p2){return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1]);}
+    
     int minCostConnectPoints(vector<vector<int>>& points) {
-        vector<int> parent;
-        vector<pair<int, pair<int, int>>> edges;
-        int n = points.size();
-
-        for (int i = 0; i < n; ++i) {
-            parent.push_back(i);
-        }
-
-        for (int i = 0; i < n; ++i) {
-            for (int j = i + 1; j < n; ++j) {
-                int cost = abs(points[i][0] - points[j][0]) + abs(points[i][1] - points[j][1]);
-                edges.push_back({cost, {i, j}});
+        int ans = 0;
+        unordered_set<int> unvisited; unvisited.reserve(points.size()); 
+        for(int i = 0; i < points.size(); i++) unvisited.insert(i);
+        priority_queue<Cost_Index, vector<Cost_Index>, greater<Cost_Index>> pq;   
+        pq.push({0,0});
+        vector<int> dis(points.size(), INT_MAX); //estimated distance from the connected part to new node
+        
+        while(not pq.empty())
+        {
+            auto cur = pq.top(); pq.pop();
+            if(unvisited.find(cur.second) == unvisited.end()) continue;
+            unvisited.erase(cur.second);
+            ans += cur.first;
+            //check all unvisited neighbors(those not in the connected graph yet)
+            for(const int nxt: unvisited)
+            {
+                int tmp = d(points[cur.second],points[nxt]);
+                if( tmp  <  dis[nxt] )
+                {
+                    dis[nxt] = tmp;
+                    pq.push({tmp, nxt});
+                }
             }
         }
-
-        sort(edges.begin(), edges.end());
-
-        int min_cost = 0, num_edges = 0;
-
-        for (auto& edge : edges) {
-            int cost = edge.first;
-            int u = edge.second.first;
-            int v = edge.second.second;
-
-            if (find(parent, u) != find(parent, v)) {
-                unionSets(parent, u, v);
-                min_cost += cost;
-                num_edges++;
-            }
-
-            if (num_edges == n - 1) {
-                break;
-            }
-        }
-
-        return min_cost;
-    }
-
-private:
-    int find(vector<int>& parent, int x) {
-        if (parent[x] == x) {
-            return x;
-        }
-        parent[x] = find(parent, parent[x]);
-        return parent[x];
-    }
-
-    void unionSets(vector<int>& parent, int x, int y) {
-        parent[find(parent, x)] = find(parent, y);
+        return ans;
     }
 };
