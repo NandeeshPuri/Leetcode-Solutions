@@ -41,7 +41,7 @@ public:
         }
         
         // Implementing BFS
-        while(q.empty() == false) // until queue is not empty
+        while(!q.empty()) // until queue is not empty
         {
             tuple curr = q.front(); // extracting front tuple
             q.pop(); // pop from queuu
