@@ -1,22 +1,25 @@
 class Solution {
 public:
-	int minOperations(vector<int>& nums, int x) {
-		int sum = accumulate(nums.begin(), nums.end(), 0);
-
-		if(sum < x) return -1;
-		if(sum == x) return nums.size();
-
-		int target = sum - x, currentSum = 0, start = 0, maxSize = 0;
-		for(int i = 0; i < nums.size(); i++) {
-			currentSum += nums[i];
-
-			while(currentSum > target)
-				currentSum -= nums[start++];
-
-			if(currentSum == target)
-				maxSize = max(maxSize, i - start + 1);
-		}
-
-		return (maxSize == 0) ? - 1 : nums.size() - maxSize;
-	}
+    int minOperations(vector<int>& nums, int x) {
+        int target = 0, n = nums.size();
+        for (int num : nums) target += num;
+        target -= x;
+        
+        if (target == 0) return n;
+        
+        int max_len = 0, cur_sum = 0, left = 0;
+        
+        for (int right = 0; right < n; ++right) {
+            cur_sum += nums[right];
+            while (left <= right && cur_sum > target) {
+                cur_sum -= nums[left];
+                left++;
+            }
+            if (cur_sum == target) {
+                max_len = max(max_len, right - left + 1);
+            }
+        }
+        
+        return max_len ? n - max_len : -1;
+    }
 };
