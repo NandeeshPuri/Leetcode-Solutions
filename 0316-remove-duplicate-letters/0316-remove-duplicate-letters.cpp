@@ -1,25 +1,34 @@
 class Solution {
 public:
-        string removeDuplicateLetters(string s) {
-        int n = s.size();
-        array<int, 26> counts = {};
-        for (auto c: s) {
-            counts[c-'a']++;
+    string removeDuplicateLetters(string s) {
+        int len = s.size();
+        string res = "";
+        unordered_map<char, int> M;
+        unordered_map<char, bool> V;
+        stack<int> S;
+        
+        for (auto c : s) {
+            if (M.find(c) == M.end()) M[c] = 1;
+            else M[c]++; 
         }
-        deque<char> candidate;
-        unordered_set<char> pushed;
-        for (auto c: s) {
-            // not pushed before & less than stack top && will not cause stack top fail
-            while (!candidate.empty() && candidate.back() >= c && !pushed.count(c) && counts[candidate.back()-'a']) {
-                pushed.erase(candidate.back());
-                candidate.pop_back();
+        for (unordered_map<char, int>::iterator iter=M.begin(); iter!=M.end(); iter++) V[iter->first] = false;
+        
+        cout<<M.size()<<V.size()<<endl;
+        for (int i=0; i<len; i++) {
+            M[s[i]]--;
+            if (V[s[i]] == true) continue;
+            
+            while (!S.empty() and s[i] < s[S.top()] and M[s[S.top()]] > 0) {
+                V[s[S.top()]] = false;
+                S.pop();
             }
-            if (!pushed.count(c)) {
-                candidate.push_back(c);    
-                pushed.insert(c);
-            }
-            counts[c-'a']--;
+            S.push(i);
+            V[s[i]] = true;
         }
-        return string(candidate.begin(), candidate.end());
+        while (!S.empty()) {
+            res = s[S.top()] + res;
+            S.pop();
+        }
+        return res;
     }
 };
